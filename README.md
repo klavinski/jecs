@@ -8,6 +8,21 @@ This is a two-weeks Java student project. Its architecture results from many exp
 * **Constant complexity**: you can start contributing to any game just after reading this documentation.
 * **Collaborative**: the engine is completely composable. The code of two mods cannot be contradictory.
 
+## Table of contents
+
+* [Principles](#principles)
+    * [State/logic separation](#statelogic-separation)
+    * [Composition over inheritance](#composition-over-inheritance)
+* [Architecture](#architecture)
+    * [Entity and Component](#entity-and-component)
+    * [System](#system)
+* [Usage](#usage)
+    * [Creating a new Component](#creating-a-new-component)
+    * [Creating a new Entity](#creating-a-new-entity)
+    * [Creating a new System](#creating-a-new-system)
+    * [Prototyping](#prototyping)
+    * [Multiplayer](#multiplayer)
+
 ## Principles
 
 Everything follows from the core principle: developer experience. Legible code, a fast prototyping loop, a minimal and expressive API.
@@ -120,7 +135,7 @@ Usually, try to keep a `System` minimal and composable. For instance:
 
 ## Usage
 
-After downloading the engine, open it in [Eclipse](https://www.eclipse.org). The engine code in `/core` is around 50 lines (with the exception of core.Frame, boileplate handling the I/O), so you can read and master it in 10 minutes.
+After downloading the engine, open it in [Eclipse](https://www.eclipse.org). The engine code in `/core` is around 50 lines (with the exception of `core.Frame`, boileplate handling the I/O), so you can read and master it in 10 minutes.
 
 ### Creating a new `Component`
 
