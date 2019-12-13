@@ -10,11 +10,11 @@ This is a two-weeks Java student project. Its architecture results from many exp
 
 ## Principles
 
-Everything follows from the core principle: the developer experience. Legible code, a fast prototyping loop, a minimal and expressive API.
+Everything follows from the core principle: developer experience. Legible code, a fast prototyping loop, a minimal and expressive API.
 
 ### State/logic separation
 
-Java favours grouping state (attributes) and logic (methods) inside a class. Completely separating them brings significant advantages:
+Java favours grouping state (attributes) and logic (methods) inside a class. Completely separating them brings about significant advantages:
 * The state of the world can be serialised, saved and loaded, and sent over the network for multiplayer games.
 * Since logic only operates on the state, it can be changed at will while the game is running. This brings fast prototyping and no-restart updates for multiplayer games.
 
@@ -22,17 +22,17 @@ Java favours grouping state (attributes) and logic (methods) inside a class. Com
 
 Similarly, Java favours inheritance. While the engine itself uses it, it offers a purely composable environment:
 * Contributing to a particular class does not require knowing the whole lineage.
-* Many components, such as "solid", "inflammable", "wet", etc. can be added to an entity, allowing for emergent gameplay (inspired by the _Breath of the Wild prototype_).
+* Many components, such as "solid", "inflammable", "wet", etc. can be added to an entity, allowing for emergent gameplay (inspired by the [_Breath of the Wild_ prototype](https://www.youtube.com/watch?v=QyMsF31NdNc)).
 
 ## Architecture
 
 The whole engine codebase is inside the `code` repertory. There are 4 classes:
 * **Component**, the data building brick.
 * **Entity**, build out of components.
-* **System**, (actually System_ since System) applied to entities.
+* **System**, (actually `System_` since Java reserves `System`) applied to entities.
 * **Frame**, code for I/O.
 
-Finally, there is **Engine** containing the `main` method.
+Finally, **Engine** contains the `main` method.
 
 ### Entity and Component
 
@@ -65,7 +65,7 @@ We choose to map `Component`s instead of `Strings` to ensure name availability w
 `Entity` would have 3 methods:
 * `bool has( Class component )`
 * `Object get( Class component )`
-* `void set( Class component`, Object value )`
+* `void set( Class component, Object value )`
 ```java
 Entity mario = new Entity();
 ...
@@ -83,7 +83,7 @@ Drawbacks:
 * adding `.class` is mandatory in Java
 
 3. The least intuitive but most effective: components store a map from entities to their component values.
-`Component`s have 3 methods (with T defined within the `Component`):
+`Component`s have 3 methods (with `T` defined within the `Component`):
 * `bool in( Entity entity )`
 * `T of( Entity )` as getter
 * `of( Entity entity, T newValue )` as setter
@@ -106,21 +106,21 @@ The default implementation is a `WeakHashMap`, meaning that components from remo
 
 In addition, `Component`s can provide custom methods for high-performance operations. _For example, a `X` `Component` for position may have an `Entity[] getEntitiesBetween( double x1, double x2 )` for computing collisions._
 
-Note that the last two syntax, although less idiomatic, allow adding components at runtime. No more one entity = one class.
+Note that the last two syntaxes, although less idiomatic, allow adding components at runtime. One class per `Entity` instance is not necessary.
 
 ### System
 
-Whereas `Entity`s and `Component`s handle the state, `System`s handle the logic, per the state/logic principle. After their instantiation, each `System` gets called one after another `Frame.FPS` times per second through `void apply( Entity[] entities )`. Since they sequentially mutate the state, they can never mutually contradict themselves.
+Whereas `Entity`s and `Component`s handle the state, `System`s handle the logic, per the state/logic separation principle. After their instantiation, each `System` gets called one after another `Frame.FPS` times per second through `void apply( Entity[] entities )`. Since they sequentially mutate the state, they can never mutually contradict themselves.
 
 ⚠ State (instance variables) is forbidden in a `System`! The only exception is performance, such as buffering graphics for the `Render` `System`.
 
 Usually, try to keep a `System` minimal and composable. For instance:
 * breaking `Physics` up into `Friction`, `Gravity`, `Move`
-* each `System` should try to perform only associate and commutative operations. Each component can be provided with one [reducer](https://en.wikipedia.org/wiki/Fold_(higher-order_function). Here, `Friction` and `Gravity`  mutate the forces on an `Entity` and `Move` computes the new position or transmits forces to colliding `Entity`s.
+* each `System` should try to perform only associate and commutative operations. Each component can be provided with one [reducer](https://en.wikipedia.org/wiki/Fold_(higher-order_function)). Here, `Friction` and `Gravity`  mutate the forces on an `Entity` and `Move`, the reducer, computes the new position or transmits forces to colliding `Entity`s.
 
 ## Usage
 
-After downloading the engine, open it in Eclipse. The engine code in /core is around 50 lines (with the exception of core.Frame, boileplate handling the I/O), so you can read and master it in 10 minutes.
+After downloading the engine, open it in [Eclipse](https://www.eclipse.org). The engine code in `/core` is around 50 lines (with the exception of core.Frame, boileplate handling the I/O), so you can read and master it in 10 minutes.
 
 ### Creating a new `Component`
 
@@ -155,7 +155,7 @@ new Flower( 1.0, 2.0, 0.0 );
 
 Create a new class extending `core.System_`. The boilerplate code is automatically created. You just have to complete the `apply`  method. It usually follows this pattern:
 1. For each entity
-2. State the conditions on components
+2. Given some conditions on components
 3. Mutate the entities
 
 For instance, suppose we have a `Health` `Component`. We want a minimal system damaging burning `Entity`s:
@@ -166,39 +166,29 @@ public class BurningDamage extends System {
 
     public void apply( Entity[] entities ) {
 
-        for ( Entity entity: entities )  // 1
-        if ( Burning.in( entity ) )      // 2: if the entity has a Burning component
-        if ( Burning.of( entity ) )      //    if Burning is set to true
-        if ( Health .in( entity ) )      //    if entity has a Health component
-             Health .of( entity,         // 3: we set it to
-             Health .of( entity ) - 1 ); //    its current value minus one
+        for ( Entity entity: entities )   // 1
+        if  ( Burning.in( entity ) )      // 2: if the entity has a Burning component
+        if  ( Burning.of( entity ) )      //    if Burning is set to true
+        if  ( Health .in( entity ) )      //    if entity has a Health component
+              Health .of( entity,         // 3: we set it to
+              Health .of( entity ) - 1 ); //    its current value minus one
     }
 }
 ```
-And in Engine.java, we add `new BurningDamage()` to the list of `System`s. Done!
+In Engine.java, we add `new BurningDamage()` to the list of `System`s. Done!
 
-This is what allows composition of systems and multiplicative gameplay. If we already have a system remove `Entity`s with a `Health` < 0, our burnt entities will automatically be removed. Note also how the above code cannot contradict any existing code.
+This allows composition of systems and multiplicative gameplay. If we already have a system removing `Entity`s with their `Health` < 0, our burnt entities will automatically be removed. Note also how the above code cannot contradict any existing code.
 
 ### Prototyping
 
-Run the engine by clicking the 🐞 (debug) icon.
-
-Let us imagine you are developing the jump `System` for a platformer game. You walk to a large rock, and jump. Alas, the jump is not strong enough. Instead of:
-
-* closing the game
-* nudging the strength of the jump in the `System`
-* restarting the game
-* walking to the rock, and
-* trying again
-
-You can keep the game running, change the value and save, and jump again. The JVM will replace the `System` on the fly. This is only possible because `System`s contain no state.
+Run the engine by clicking the 🐞 (debug) icon. If you want to change some code at runtime, you can keep the game running, change the code and save it. The JVM will replace the `System` on the fly. This is only possible because `System`s contain no state.
 
 ### Multiplayer
 
-One final example showing the extensibility of the ECS architecture. Imagine you developed a successful role-playing game. How to make it multiplayer? A usual Java architecture (inheritance, grouping state and logic by class) would make it hard to transition. State would be computed to the server, but should be sent to the client... With the ECS architecture:
+One final example showing the extensibility of the ECS architecture. Imagine you developed a successful game. How to make it multiplayer? A usual Java architecture (inheritance, grouping state and logic by class) would make it hard to pivot. State would be computed to the server, but should be sent to the client... With the ECS architecture:
 * Keep a single client/server codebase
 * Remove all systems from the client except I/O
 * In the client's `Component`, instead of reading and writing the local state, make it read and write the distant state
-* In the server codebase, add a System to send the relevant parts of the state to the clients.
+* In the server codebase, add a `System` to send the relevant parts of the state to the clients.
 
-Done!
+That is it.
