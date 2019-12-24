@@ -2,6 +2,10 @@
 
 This is a two-weeks Java student project. Its architecture results from many experiments. The following document explains its core principles, decisions, and how to use it. It is provided with a demo (graphics and music are the respective property of Nintendo and Braxton Burks).
 
+![Demo screenshot](./demo.png)
+
+[Demo on Youtube (Enable captions)](https://www.youtube.com/watch?v=OWGnZuixO54&cc_load_policy=1) - [Reddit thread](https://www.reddit.com/r/pokemon/comments/ee942s/my_dream_pok%C3%A9mon_game_prototype_with_code_in/)
+
 ## Features
 
 * **Live programming**: modify your code while your game is running.
